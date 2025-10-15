@@ -202,7 +202,7 @@ function ResultContent() {
       const text = `나의 성격 유형은 ${type} - ${typeData.title}입니다!`;
       
       // Web Share API 사용 (모바일에서 네이티브 공유)
-      if (navigator.share && navigator.canShare) {
+      if (navigator.share) {
         await navigator.share({
           title: `${type} - ${typeData.title}`,
           text: text,

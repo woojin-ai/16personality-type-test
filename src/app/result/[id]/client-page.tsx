@@ -223,7 +223,7 @@ export default function SharedResultPage() {
     const text = `나의 성격 유형은 ${type} - ${typeData.title}입니다!`;
     
     try {
-      if (navigator.share && navigator.canShare) {
+      if (navigator.share) {
         await navigator.share({
           title: `${type} - ${typeData.title}`,
           text: text,
