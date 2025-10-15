@@ -189,14 +189,24 @@ function ResultContent() {
   const typeData = personalityTypes[type] || personalityTypes['INFP'];
 
   const handleShare = () => {
+    const currentUrl = `${window.location.origin}/test/result?type=${type}&data=${encodeURIComponent(JSON.stringify(percentages))}`;
     const text = `나의 성격 유형은 ${type} - ${typeData.title}입니다!`;
+    
     if (navigator.share) {
       navigator.share({
-        title: '16가지 성격유형 검사',
+        title: '16가지 성격유형 검사 결과',
         text: text,
-      }).catch(() => {});
+        url: currentUrl,
+      }).catch((error) => {
+        console.error('공유 실패:', error);
+      });
     } else {
-      alert(text);
+      // 공유 API가 없는 경우 URL 복사
+      navigator.clipboard.writeText(currentUrl).then(() => {
+        alert('결과 페이지 링크가 복사되었습니다!\n\n' + text + '\n\n' + currentUrl);
+      }).catch(() => {
+        alert(text + '\n\n' + currentUrl);
+      });
     }
   };
 
