@@ -48,10 +48,9 @@ export const metadata: Metadata = {
   },
   verification: {
     google: '_YX3kbSeZq2clAsi9usIngHj7Q_4ScH4ywFCIpREnvQ',
-    // 나중에 네이버 서치어드바이저 인증 코드 추가
-    // other: {
-    //   'naver-site-verification': 'naver-verification-code',
-    // },
+    other: {
+      'naver-site-verification': 'f6458e28f29f30840012eb4f969d481b16ecd27d',
+    },
   },
 };
 
