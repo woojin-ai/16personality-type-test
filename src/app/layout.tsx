@@ -47,8 +47,8 @@ export const metadata: Metadata = {
     },
   },
   verification: {
-    // 나중에 Google Search Console, 네이버 서치어드바이저 인증 코드 추가
-    // google: 'google-site-verification-code',
+    google: '_YX3kbSeZq2clAsi9usIngHj7Q_4ScH4ywFCIpREnvQ',
+    // 나중에 네이버 서치어드바이저 인증 코드 추가
     // other: {
     //   'naver-site-verification': 'naver-verification-code',
     // },
