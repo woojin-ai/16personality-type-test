@@ -1,8 +1,10 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Script from 'next/script';
 import './globals.css';
 import Header from '@/components/Header';
 import Footer from '@/components/Footer';
+import SideAds from '@/components/SideAds';
 
 const inter = Inter({ subsets: ['latin'] });
 
@@ -63,8 +65,16 @@ export default function RootLayout({
     <html lang="ko">
       <body className={inter.className}>
         <Header />
+        <SideAds />
         <main className="min-h-screen">{children}</main>
         <Footer />
+        
+        {/* 카카오 애드핏 스크립트 */}
+        <Script
+          src="//t1.daumcdn.net/kas/static/ba.min.js"
+          strategy="afterInteractive"
+          async
+        />
       </body>
     </html>
   );
