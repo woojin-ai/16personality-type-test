@@ -1,9 +1,9 @@
 'use client';
 
+import { useEffect, useState } from 'react';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
-import { Suspense } from 'react';
 
 const personalityTypes: Record<string, any> = {
   "ISTJ": {
@@ -168,40 +168,61 @@ const personalityTypes: Record<string, any> = {
   }
 };
 
-function ResultContent() {
-  const searchParams = useSearchParams();
-  const type = searchParams.get('type') || 'INFP';
-  const dataStr = searchParams.get('data') || '';
-  
-  let percentages = { EI: { E: 50, I: 50 }, SN: { S: 50, N: 50 }, TF: { T: 50, F: 50 }, JP: { J: 50, P: 50 } };
-  
-  if (dataStr) {
-    try {
-      const parsed = JSON.parse(decodeURIComponent(dataStr));
-      if (parsed.EI && parsed.SN && parsed.TF && parsed.JP) {
-        percentages = parsed;
+export default function SharedResultPage() {
+  const params = useParams();
+  const router = useRouter();
+  const [loading, setLoading] = useState(true);
+  const [type, setType] = useState('INFP');
+  const [percentages, setPercentages] = useState({ 
+    EI: { E: 50, I: 50 }, 
+    SN: { S: 50, N: 50 }, 
+    TF: { T: 50, F: 50 }, 
+    JP: { J: 50, P: 50 } 
+  });
+
+  useEffect(() => {
+    const fetchResult = async () => {
+      try {
+        const id = params.id as string;
+        const response = await fetch(`/api/share?id=${id}`);
+        
+        if (!response.ok) {
+          throw new Error('결과를 찾을 수 없습니다');
+        }
+        
+        const data = await response.json();
+        setType(data.type);
+        setPercentages(data.percentages);
+      } catch (error) {
+        console.error('결과 로드 실패:', error);
+        alert('결과를 찾을 수 없습니다. 홈으로 이동합니다.');
+        router.push('/');
+      } finally {
+        setLoading(false);
       }
-    } catch (e) {
-      console.error('Failed to parse percentages:', e);
-    }
+    };
+
+    fetchResult();
+  }, [params.id, router]);
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center min-h-screen">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-purple-600 border-solid mx-auto mb-4"></div>
+          <p className="text-gray-600">결과를 불러오는 중...</p>
+        </div>
+      </div>
+    );
   }
 
   const typeData = personalityTypes[type] || personalityTypes['INFP'];
 
   const handleShare = async () => {
+    const shortUrl = window.location.href;
+    const text = `나의 성격 유형은 ${type} - ${typeData.title}입니다!`;
+    
     try {
-      // 결과를 서버에 저장하고 짧은 ID 받기
-      const response = await fetch('/api/share', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ type, percentages })
-      });
-      
-      const { id } = await response.json();
-      const shortUrl = `${window.location.origin}/result/${id}`;
-      const text = `나의 성격 유형은 ${type} - ${typeData.title}입니다!`;
-      
-      // Web Share API 사용 (모바일에서 네이티브 공유)
       if (navigator.share && navigator.canShare) {
         await navigator.share({
           title: `${type} - ${typeData.title}`,
@@ -209,16 +230,11 @@ function ResultContent() {
           url: shortUrl,
         });
       } else {
-        // 공유 API가 없는 경우 클립보드에 복사
         await navigator.clipboard.writeText(shortUrl);
         alert(`링크가 복사되었습니다!\n\n${text}\n${shortUrl}`);
       }
     } catch (error) {
       console.error('공유 실패:', error);
-      // 실패 시 기존 방식 사용
-      const fallbackUrl = `${window.location.origin}/test/result?type=${type}&data=${encodeURIComponent(JSON.stringify(percentages))}`;
-      navigator.clipboard.writeText(fallbackUrl).catch(() => {});
-      alert(`나의 성격 유형은 ${type} - ${typeData.title}입니다!\n\n${fallbackUrl}`);
     }
   };
 
@@ -426,19 +442,11 @@ function ResultContent() {
               href="/test"
               className="text-purple-600 hover:underline"
             >
-              다시 검사하기
+              나도 검사하기
             </Link>
           </div>
         </div>
       </div>
     </div>
-  );
-}
-
-export default function ResultPage() {
-  return (
-    <Suspense fallback={<div className="flex items-center justify-center min-h-screen">로딩중...</div>}>
-      <ResultContent />
-    </Suspense>
   );
 }
