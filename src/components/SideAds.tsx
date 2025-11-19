@@ -17,7 +17,7 @@ export default function SideAds() {
         <ins 
           className="kakao_ad_area" 
           style={{ display: 'none' }}
-          data-ad-unit="DAN-iO3yQjSuNvLpZirZ"
+          data-ad-unit="DAN-P9xpuZWioPWKFkJF"
           data-ad-width="160"
           data-ad-height="600"
         />
